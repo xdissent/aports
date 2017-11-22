@@ -1,14 +1,14 @@
 diff -up chromium-61.0.3163.79/chrome/browser/devtools/devtools_file_system_indexer.cc.gcc5fix chromium-61.0.3163.79/chrome/browser/devtools/devtools_file_system_indexer.cc
 --- chrome/browser/devtools/devtools_file_system_indexer.cc.gcc5fix	2017-09-06 16:32:34.496782451 -0400
 +++ chrome/browser/devtools/devtools_file_system_indexer.cc	2017-09-06 16:33:22.053865242 -0400
-@@ -34,7 +34,6 @@ using base::TimeDelta;
- using base::TimeTicks;
- using content::BrowserThread;
- using std::map;
--using std::set;
- using std::string;
- using std::vector;
+@@ -39,7 +39,6 @@ using std::vector;
  
+ namespace {
+ 
+-using std::set;
+ 
+ base::SequencedTaskRunner* impl_task_runner() {
+   constexpr base::TaskTraits kBlockingTraits = {base::MayBlock(),
 @@ -191,7 +190,7 @@ vector<FilePath> Index::Search(const str
      if (trigram != kUndefinedTrigram)
        trigrams.push_back(trigram);
@@ -58,10 +58,11 @@ diff -up chromium-61.0.3163.79/third_party/webrtc/modules/audio_processing/aec3/
 +++ third_party/webrtc/modules/audio_processing/aec3/aec_state.cc	2017-09-06 16:35:03.027919336 -0400
 @@ -10,7 +10,7 @@
  
- #include "webrtc/modules/audio_processing/aec3/aec_state.h"
+ #include "modules/audio_processing/aec3/aec_state.h"
  
 -#include <math.h>
 +#include <cmath>
+ 
  #include <numeric>
  #include <vector>
  

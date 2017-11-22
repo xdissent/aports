@@ -1,0 +1,10 @@
+--- chromium-64.0.3269.3/third_party/WebKit/Source/modules/webdatabase/Database.h.orig	2017-11-23 11:12:00.000000000 -0600
++++ chromium-64.0.3269.3/third_party/WebKit/Source/modules/webdatabase/Database.h	2017-11-23 11:12:26.000000000 -0600
+@@ -28,6 +28,7 @@
+ 
+ #include "modules/webdatabase/DatabaseBasicTypes.h"
+ #include "modules/webdatabase/DatabaseError.h"
++#include "modules/webdatabase/SQLTransactionBackend.h"
+ #include "modules/webdatabase/sqlite/SQLiteDatabase.h"
+ #include "platform/bindings/ScriptWrappable.h"
+ #include "platform/bindings/TraceWrapperMember.h"

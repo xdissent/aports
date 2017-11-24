@@ -1,7 +1,7 @@
 # Contributor: Carlo Landmeter <clandmeter@gmail.com>
 # Maintainer: Carlo Landmeter <clandmeter@gmail.com>
 pkgname=chromium
-pkgver=61.0.3163.100
+pkgver=62.0.3202.94
 pkgrel=0
 pkgdesc="chromium web browser"
 url="http://www.chromium.org/"
@@ -99,14 +99,13 @@ source="https://commondatastorage.googleapis.com/chromium-browser-official/$pkgn
 	swiftshader.patch
 	secure_getenv.patch
 	gcc-fixes.patch
-	fix-atk.patch
 	chromium-48.0.2564.116-libusb_interrupt_event_handler.patch
 	chromium-60.0.3112.78-gn-system.patch
 	chromium-60.0.3112.78-jpeg-nomangle.patch
 	chromium-60.0.3112.78-no-libpng-prefix.patch
 	chromium-60.0.3112.78-no-zlib-mangle.patch
 	chromium-61.0.3163.79-gcc5-r1.patch
-	chromium-61.0.3163.79-gtk2fix.patch
+	chromium-62.0.3202.94-webkit-header.patch
 	"
 
 builddir="$srcdir"/$pkgname-$pkgver
@@ -187,6 +186,7 @@ build() {
 	# https://bugs.chromium.org/p/v8/issues/detail?id=3782
 	# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69234
 	CFLAGS="$CFLAGS -fno-delete-null-pointer-checks"
+	msg "CFLAGS: $CFLAGS"
 
 	msg "Replacing gyp files"
 	python build/linux/unbundle/replace_gn_files.py --system-libraries \
@@ -242,11 +242,11 @@ build() {
 
 	msg "Ninja turtles GO!"
 	# build mksnapshot and paxmark it
-	ninja -C out/$_buildtype mksnapshot
-	paxmark -m out/$_buildtype/mksnapshot
+	#ninja -C out/$_buildtype mksnapshot
+	#paxmark -m out/$_buildtype/mksnapshot
 
 	# finish rest of the build
-	ninja -C out/$_buildtype chrome chrome_sandbox chromedriver
+	#ninja -C out/$_buildtype chrome chrome_sandbox chromedriver
 }
 
 package() {
@@ -319,7 +319,7 @@ chromedriver() {
 	mv "$pkgdir"/usr/bin/chromedriver "$subpkgdir"/usr/bin
 }
 
-sha512sums="4dfd3a493ceb7c605eeab6f387541273d529e8b935a6104927e34836469aedcfcbb4a1154591585621d5c2e842e68701d32328acba842f840a20498822165f78  chromium-61.0.3163.100.tar.xz
+sha512sums="09e05aec663de94633fb7b658154a5b0146159dea0f434ef412405530274daefc5e554be8120653b840d2b55f5e35202be1a653ece7796d00956df58bc7608ad  chromium-62.0.3202.94.tar.xz
 a3bb959c65944ae2fb765725cedcffd743a58bc0c2cd1f1999d15fe79801d00f3474b08b4ed7b48859ed921eb57093d0ad09d90f201d729ed9b8a419a591ed29  pstables-2.8.h
 b9a810416dd7a8ffc3a5ced85ad9acebda1665bd08a57eec7b189698cc5f74d2c3fd69044e20fcb83297a43214b2772a1312b2c6122ea0eb716abacf39524d60  chromium-launcher.sh
 f6d962b9e4c22dd42183df3db5d3202dab33eccecafb1bf63ca678147289581262db1e5e64cbe8f9c212beefb0a6717bb8d311e497f56b55fe95b8bab2db493f  chromium.conf
@@ -328,7 +328,7 @@ e182c998a43d22d1c76a86c561619afd1fca8c2be668265ad5e2f81a3806f7a154272cc027a2f8b3
 55921cc33d623e0751e94d4fef2ddd69afb57381da6115995b1f318e2398978b9173e80f6ffbc6e6c0c0c55a04e934e0e34a46c32e03947cc31f0f5a226e7725  chromium-widevine.patch
 05fb6d9434565a7a73f5c18d470ae600bf4afbe15d0e4a7c2770bf2596a0bd2788cdfeb37e0b566fc3d26ff2d0791b70488b2c184e3286cff5a1fa25e17582cd  default-pthread-stacksize.patch
 88928afcc33843e17daa082435a4b88c2106b0252a202ad19f684021c027859366a0c12970700c0d1b010211eef95d295362dc6afdea1b00199dd8d2efbdcfe7  gcc6.patch
-902aeffaf0a755dd856a7d96c390adafd53ff23aed0a3693acc86a680d8c001f0f565f50caafd8bac4bba6f5e04011ebd9c27cda3264fd2ffc27df2803b738b1  gn_bootstrap.patch
+ebcf07ba6f9ed36bb2eba5736154a3505dc7dd8c5db58a6aa177f5bdddb12e8158c7769ec3bfe9f0d06e77279f8f28971444e9f75042049122ea9cf4e56bc296  gn_bootstrap.patch
 8fbfd67a0b6bbdf08364e810bd85b4a80dda9af73fefe3aba8010d9b33022d458a785c628515bbda9c743b8a0293d57cfe18fcc5aa2313c845c6fb948c2335f9  last-commit-position.patch
 c78e868ec5b902e5fd5febca8aaf9649bd598c747d8e260683552d29bb322e2e4cb1e71d92750e3209096e24416297396cca47a6a855b657cb7685b39d06b0f0  musl-fixes.patch
 507a8db2317f1f6ec18dec6cb5894b716e9b2542b58887bab9319bc6d4c66fe4a4d09b200ca8e3f11b32e380b282442a27e7a1b358d3c25eef0fa7655e9dc134  musl-hacks.patch
@@ -341,12 +341,11 @@ ac0c9d7780ac897ea8ad5d909616d3aa29eed720353c7a660c850ee1404c80f51f5db274b3c5d3c7
 27dd7916be3324294a0a913c43c856e9c00be767a2aec4f3da2455fb84e74ebb0017d1aa586b40dd9d989ada6b60fc531522f503d57e04324726a2171bf3a85e  unset-madv_free.patch
 6b0812725a0fc562527f3556dc4979fec72d1ba92f26a5e78ff2016c39bb2c155a0ff95fc22101f9c097d14b84182d6615276f4247f60ae7833ab45da8366e6d  swiftshader.patch
 67eea8e13c85aca7db5c85f5b0d33e5798e8063ab7f5b2f0a5c7f6fee8266e58bee4e72f4542472ef6634634ca0f4359a2d1113fa310a991373404320c784730  secure_getenv.patch
-0d6935117e3531a33aab5d09093e854c7e82e799340222cd75e3a1d7e054fbe02524f59c56d01a36649da5c89042a6ce7af2313917d3d5a3947ee7c890b99ba6  gcc-fixes.patch
-aa44cbc1857f407d897fba8c64faa6401aa9c30f4de0a6c79e0fb63086b0ee518e411335a53c0bd75c3023f3f064aff57270a47ffe4f8f31c251aa318570e0c2  fix-atk.patch
+b7a9629d6b5899c78de34bf97f2fa3b413aaf3ced02b0196b3f0d24df506c9abe686dd75f5ee5e6b546cedc4880d51d92c422d405d62ffcb84eb8bd255ee24a2  gcc-fixes.patch
 2e9496aa9ccd6fed2d0df4b659d55e87abb67b1be4e3cc7cb0483ccb458b9071bed9939132a2345bf15192b4dcfe5da9474d7f653ae2f4b4d46d2f3c032b3a3f  chromium-48.0.2564.116-libusb_interrupt_event_handler.patch
 197ca3fd315e15c3e0b796615afbd01f65e2040027a2cde6304dea500cfaf18372ce2be88f4030bcd26651b913dd4af741a4df8803cdf9ff062a8eef9ab6c5db  chromium-60.0.3112.78-gn-system.patch
 e9fcc976d2ac1b2e73d310790e76dae15111e78cd8e3efa5febd702fd9492d7d68b1b57d95bca88d5e16c0627594a00ebdeaf570df52be6e9b23a4212906c141  chromium-60.0.3112.78-jpeg-nomangle.patch
 9b08e895826fdd14fd6334662b8d07807beabab7368f3fcff3fcebe76baba4c7714c55042b379da6dab1ea0b1c4e5d657bf972b644089f00b418b7c2f5b6ef1b  chromium-60.0.3112.78-no-libpng-prefix.patch
 87a0c6ff4906f0c4b6f6b471ec9bf0b2e2d28431122e99a68f957474cf27ec6b073ebca14660c8858817219521d74a184b8444cf2885db21d28fa4599fcaa66f  chromium-60.0.3112.78-no-zlib-mangle.patch
-b39701c208d2786cc4b68ea033807a8663358173442ce0884dbfdebaa4b784d3eae8d7c1fe96c71ce8919fea35c50e1951c6a12193c23ae3e520604b3374ca38  chromium-61.0.3163.79-gcc5-r1.patch
-3820f10d6c857d2727bcb862745d4f00b217c585e7a19db56c390c3331939fdf22bee758c3ccfb4b360d75a1c05b65e3406fd27a23d69492f86d907830223063  chromium-61.0.3163.79-gtk2fix.patch"
+37aa421e94175aa3dd31ab6f299192b08e9ed5f1e39da6f3b3378dc422030ccb9aa10906e4c9c0dd92b4861df7630131c65507f611b34ae58b23a56ac7ad7d82  chromium-61.0.3163.79-gcc5-r1.patch
+7db317dcaeff0d8b74ab27a965358ac060b788567236446632ea5b0d65e0baddbd5236c2546204e7879619dc5c1402e4ef59492647b354881655b227abc1f143  chromium-62.0.3202.94-webkit-header.patch"

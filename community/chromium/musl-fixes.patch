@@ -13,12 +13,12 @@
  /* End of x86-64 definitions                                                 */
  #elif defined(__mips__)
  #if _MIPS_SIM == _MIPS_SIM_ABI32
---- ./breakpad/src/client/linux/dump_writer_common/ucontext_reader.cc.orig
-+++ ./breakpad/src/client/linux/dump_writer_common/ucontext_reader.cc
+--- ./third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.cc.orig
++++ ./third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.cc
 @@ -49,7 +49,7 @@
  }
  
- void UContextReader::FillCPUContext(RawContextCPU *out, const ucontext *uc,
+ void UContextReader::FillCPUContext(RawContextCPU *out, const ucontext_t *uc,
 -                                    const struct _libc_fpstate* fp) {
 +                                    const struct _fpstate* fp) {
    const greg_t* regs = uc->uc_mcontext.gregs;
@@ -27,25 +27,25 @@
 @@ -97,7 +97,7 @@
  }
  
- void UContextReader::FillCPUContext(RawContextCPU *out, const ucontext *uc,
+ void UContextReader::FillCPUContext(RawContextCPU *out, const ucontext_t *uc,
 -                                    const struct _libc_fpstate* fpregs) {
 +                                    const struct _fpstate* fpregs) {
    const greg_t* regs = uc->uc_mcontext.gregs;
  
    out->context_flags = MD_CONTEXT_AMD64_FULL;
---- ./breakpad/src/client/linux/dump_writer_common/ucontext_reader.h.orig
-+++ ./breakpad/src/client/linux/dump_writer_common/ucontext_reader.h
+--- ./third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.h.orig
++++ ./third_party/breakpad/breakpad/src/client/linux/dump_writer_common/ucontext_reader.h
 @@ -50,7 +50,7 @@
    //   info: the collection of register structures.
  #if defined(__i386__) || defined(__x86_64)
-   static void FillCPUContext(RawContextCPU *out, const ucontext *uc,
+   static void FillCPUContext(RawContextCPU *out, const ucontext_t *uc,
 -                             const struct _libc_fpstate* fp);
 +                             const struct _fpstate* fp);
  #elif defined(__aarch64__)
-   static void FillCPUContext(RawContextCPU *out, const ucontext *uc,
+   static void FillCPUContext(RawContextCPU *out, const ucontext_t *uc,
                               const struct fpsimd_context* fpregs);
---- ./breakpad/src/client/linux/minidump_writer/minidump_writer.h.orig
-+++ ./breakpad/src/client/linux/minidump_writer/minidump_writer.h
+--- ./third_party/breakpad/breakpad/src/client/linux/minidump_writer/minidump_writer.h.orig
++++ ./third_party/breakpad/breakpad/src/client/linux/minidump_writer/minidump_writer.h
 @@ -48,7 +48,7 @@
  #if defined(__aarch64__)
  typedef struct fpsimd_context fpstate_t;
@@ -55,8 +55,8 @@
  #endif
  
  // These entries store a list of memory regions that the client wants included
---- ./breakpad/src/common/linux/elf_core_dump.h.orig
-+++ ./breakpad/src/common/linux/elf_core_dump.h
+--- ./third_party/breakpad/breakpad/src/common/linux/elf_core_dump.h.orig
++++ ./third_party/breakpad/breakpad/src/common/linux/elf_core_dump.h
 @@ -36,6 +36,7 @@
  #include <elf.h>
  #include <link.h>

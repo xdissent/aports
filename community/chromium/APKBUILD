@@ -154,8 +154,6 @@ build() {
 	# reusable system library settings
 	local use_system="
 		flac
-		freetype
-		harfbuzz-ng
 		libdrm
 		libjpeg
 		libpng
@@ -209,6 +207,8 @@ build() {
 		use_gold=true \
 		use_allocator=\"none\" \
 		use_allocator_shim=false \
+		use_system_freetype=true \
+		use_system_harfbuzz=true \
 	)
 
 	python tools/gn/bootstrap/bootstrap.py --gn-gen-args "$_c"
@@ -235,6 +235,8 @@ build() {
 		use_gnome_keyring=false \
 		use_pulseaudio=false \
 		use_sysroot=false \
+		use_system_freetype=true \
+		use_system_harfbuzz=true \
 	)
 
 	out/Release/gn gen out/$_buildtype --args="$_c"

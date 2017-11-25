@@ -125,8 +125,6 @@ else
 fi
 
 prepare() {
-	cd "$builddir"
-
 	local i
 	cd "$builddir"
 	for i in $source; do
@@ -143,19 +141,11 @@ prepare() {
 
 	mkdir -p third_party/node/linux/node-linux-x64/bin
 	ln -s /usr/bin/node third_party/node/linux/node-linux-x64/bin/
-}
 
-_gn_flags() {
-	echo $*
-}
-
-build() {
-	cd "$builddir"
 	# reusable system library settings
 	local use_system="
 		flac
 		libdrm
-		libjpeg
 		libpng
 		libwebp
 		libxslt
@@ -180,23 +170,17 @@ build() {
 	mkdir -p "third_party/freetype/src/src/psnames/"
 	cp "$srcdir"/pstables-2.8.h third_party/freetype/src/src/psnames/pstables.h
 
-	# Work around bug in v8 in which GCC 6 optimizes away null pointer checks
-	# https://bugs.chromium.org/p/v8/issues/detail?id=3782
-	# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69234
-	CFLAGS="$CFLAGS -fno-delete-null-pointer-checks"
-
 	msg "Replacing gyp files"
 	python build/linux/unbundle/replace_gn_files.py --system-libraries \
 		${use_system}
 	third_party/libaddressinput/chromium/tools/update-strings.py
+}
 
-	##############################################################
-	# Please dont use these keys outside of Alpine Linux project #
-	# You can create your own at:                                #
-	# http://www.chromium.org/developers/how-tos/api-keys        #
-	##############################################################
-	eval "$(base64 -d < $srcdir/google-api.keys)"
+_gn_flags() {
+	echo $*
+}
 
+_gn_bootstrap() {
 	msg "Bootstrapping GN"
 	local _c=$(_gn_flags is_clang=false \
 		use_sysroot=false \
@@ -207,13 +191,23 @@ build() {
 		use_gold=true \
 		use_allocator=\"none\" \
 		use_allocator_shim=false \
+		use_system_libjpeg=true \
 		use_system_freetype=true \
 		use_system_harfbuzz=true \
 	)
 
 	python tools/gn/bootstrap/bootstrap.py --gn-gen-args "$_c"
+}
 
-	_c=$(_gn_flags \
+_gn_gen() {
+	##############################################################
+	# Please dont use these keys outside of Alpine Linux project #
+	# You can create your own at:                                #
+	# http://www.chromium.org/developers/how-tos/api-keys        #
+	##############################################################
+	eval "$(base64 -d < $srcdir/google-api.keys)"
+
+	local _c=$(_gn_flags \
 		enable_hotwording=false \
 		enable_nacl=false \
 		enable_nacl_nonsfi=false \
@@ -235,23 +229,50 @@ build() {
 		use_gnome_keyring=false \
 		use_pulseaudio=false \
 		use_sysroot=false \
+		use_system_libjpeg=true \
 		use_system_freetype=true \
 		use_system_harfbuzz=true \
 	)
 
 	out/Release/gn gen out/$_buildtype --args="$_c"
+}
 
+_ninja_mksnapshot() {
 	msg "Ninja turtles GO!"
 	# build mksnapshot and paxmark it
 	ninja -C out/$_buildtype mksnapshot
 	paxmark -m out/$_buildtype/mksnapshot
+}
 
+_ninja_v8_snapshot() {
 	# build v8_context_snapshot_generator and paxmark it
 	ninja -C out/$_buildtype v8_context_snapshot_generator
 	paxmark -m out/$_buildtype/v8_context_snapshot_generator
+}
 
+_ninja_ax_gen() {
+	ninja -C out/$_buildtype ui/accessibility:ax_gen
+}
+
+_ninja_chromium() {
 	# finish rest of the build
 	ninja -C out/$_buildtype chrome chrome_sandbox chromedriver
+}
+
+build() {
+	cd "$builddir"
+
+	# Work around bug in v8 in which GCC 6 optimizes away null pointer checks
+	# https://bugs.chromium.org/p/v8/issues/detail?id=3782
+	# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69234
+	CFLAGS="$CFLAGS -fno-delete-null-pointer-checks"
+
+	_gn_bootstrap
+	_gn_gen
+	_ninja_mksnapshot
+	_ninja_v8_snapshot
+	_ninja_ax_gen
+	_ninja_chromium
 }
 
 package() {
@@ -348,7 +369,7 @@ ac0c9d7780ac897ea8ad5d909616d3aa29eed720353c7a660c850ee1404c80f51f5db274b3c5d3c7
 67eea8e13c85aca7db5c85f5b0d33e5798e8063ab7f5b2f0a5c7f6fee8266e58bee4e72f4542472ef6634634ca0f4359a2d1113fa310a991373404320c784730  secure_getenv.patch
 b7a9629d6b5899c78de34bf97f2fa3b413aaf3ced02b0196b3f0d24df506c9abe686dd75f5ee5e6b546cedc4880d51d92c422d405d62ffcb84eb8bd255ee24a2  gcc-fixes.patch
 2e9496aa9ccd6fed2d0df4b659d55e87abb67b1be4e3cc7cb0483ccb458b9071bed9939132a2345bf15192b4dcfe5da9474d7f653ae2f4b4d46d2f3c032b3a3f  chromium-48.0.2564.116-libusb_interrupt_event_handler.patch
-197ca3fd315e15c3e0b796615afbd01f65e2040027a2cde6304dea500cfaf18372ce2be88f4030bcd26651b913dd4af741a4df8803cdf9ff062a8eef9ab6c5db  chromium-60.0.3112.78-gn-system.patch
+f64f1b6f1f404f620280cbd71870066263b50965cfe5b0051a98a08636d53d0ad1c4e1322830cd7e45ffaf2b80d142b76a0874dfe72e90445fb68e77759e00f1  chromium-60.0.3112.78-gn-system.patch
 e9fcc976d2ac1b2e73d310790e76dae15111e78cd8e3efa5febd702fd9492d7d68b1b57d95bca88d5e16c0627594a00ebdeaf570df52be6e9b23a4212906c141  chromium-60.0.3112.78-jpeg-nomangle.patch
 9b08e895826fdd14fd6334662b8d07807beabab7368f3fcff3fcebe76baba4c7714c55042b379da6dab1ea0b1c4e5d657bf972b644089f00b418b7c2f5b6ef1b  chromium-60.0.3112.78-no-libpng-prefix.patch
 87a0c6ff4906f0c4b6f6b471ec9bf0b2e2d28431122e99a68f957474cf27ec6b073ebca14660c8858817219521d74a184b8444cf2885db21d28fa4599fcaa66f  chromium-60.0.3112.78-no-zlib-mangle.patch

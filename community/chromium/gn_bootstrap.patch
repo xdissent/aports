@@ -1,8 +1,6 @@
-diff --git a/tools/gn/bootstrap/bootstrap.py b/tools/gn/bootstrap/bootstrap.py
-index 1390560..5ce7832 100755
---- tools/gn/bootstrap/bootstrap.py
+--- tools/gn/bootstrap/bootstrap.py.orig
 +++ tools/gn/bootstrap/bootstrap.py
-@@ -31,6 +32,7 @@ SRC_ROOT = os.path.dirname(os.path.dirname(GN_ROOT))
+@@ -32,6 +32,7 @@
  
  is_win = sys.platform.startswith('win')
  is_linux = sys.platform.startswith('linux')
@@ -10,8 +8,8 @@ index 1390560..5ce7832 100755
  is_mac = sys.platform.startswith('darwin')
  is_aix = sys.platform.startswith('aix')
  is_posix = is_linux or is_mac or is_aix
-@@ -167,7 +169,7 @@ def build_gn_with_ninja_manually(tempdir, options):
-   mkdir_p(root_gen_dir)
+@@ -184,7 +185,7 @@
+       {'ENABLE_MUTEX_PRIORITY_INHERITANCE': 'false'})
  
    write_buildflag_header_manually(root_gen_dir, 'base/allocator/features.h',
 -      {'USE_ALLOCATOR_SHIM': 'true' if is_linux else 'false'})
@@ -19,7 +17,7 @@ index 1390560..5ce7832 100755
  
    write_buildflag_header_manually(root_gen_dir, 'base/debug/debugging_flags.h',
        {
-@@ -395,8 +397,6 @@ def write_gn_ninja(path, root_gen_dir, options):
+@@ -436,8 +437,6 @@
        'base/third_party/superfasthash/superfasthash.c',
    ])
    static_libraries['base']['sources'].extend([
@@ -28,10 +26,10 @@ index 1390560..5ce7832 100755
        'base/at_exit.cc',
        'base/base_paths.cc',
        'base/base_switches.cc',
-@@ -653,10 +654,11 @@ def write_gn_ninja(path, root_gen_dir, options):
-         'base/threading/platform_thread_linux.cc',
-     ])
-     if is_linux:
+@@ -766,10 +765,11 @@
+               '-D_LIBCXXABI_NO_EXCEPTIONS',
+           ]
+       }
 -      static_libraries['base']['sources'].extend([
 -        'base/allocator/allocator_shim.cc',
 -        'base/allocator/allocator_shim_default_dispatch_to_glibc.cc',

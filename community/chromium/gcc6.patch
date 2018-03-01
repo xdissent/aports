@@ -10,16 +10,14 @@ index 45fee9a..0769c41 100644
  }
  
  # This is included by reference in the //build/config/compiler:runtime_library
-diff --git a/third_party/angle/src/compiler/translator/Types.h b/third_party/angle/src/compiler/translator/Types.h
-index 77db3ac..201ed4e 100644
---- third_party/angle/src/compiler/translator/Types.h
+--- third_party/angle/src/compiler/translator/Types.h.orig
 +++ third_party/angle/src/compiler/translator/Types.h
-@@ -236,7 +236,7 @@ class TType
-     {
-     }
+@@ -418,7 +418,7 @@
+     void initialize(const TTypeSpecifierNonArray &typeSpecifier, TQualifier q);
+     void initializeBasicType(TBasicType basicType);
  
--    TBasicType getBasicType() const { return type; }
-+    constexpr TBasicType getBasicType() const { return type; }
-     void setBasicType(TBasicType t);
+-    TBasicType getBasicType() const { return typeSpecifierNonArray.type; }
++    constexpr TBasicType getBasicType() const { return typeSpecifierNonArray.type; }
+     void setBasicType(TBasicType basicType) { typeSpecifierNonArray.type = basicType; }
  
-     TPrecision getPrecision() const { return precision; }
+     unsigned char getPrimarySize() const { return typeSpecifierNonArray.primarySize; }
